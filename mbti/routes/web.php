@@ -61,11 +61,23 @@ Route::middleware(['auth'])->group(function(){
 
 	//user
 	Route::get('user',[User::class,'user'])->name('user');
-	Route::get('teskepribadian',[Kepribadian::class,'teskepribadian'])->name('teskepribadian');
+	// Route::get('teskepribadian',[Kepribadian::class,'teskepribadian'])->name('teskepribadian');
+	Route::get('teskepribadian',[Kepribadian::class,'teskepribadian_update'])->name('teskepribadian');
 	Route::post('pkepribadian',[Kepribadian::class,'pkepribadian'])->name('pkepribadian');
 	Route::get('hasil',[Kepribadian::class,'hasil'])->name('hasil');
 	Route::get('cetak',[Kepribadian::class,'cetak'])->name('cetak');
+
 	Route::get('cek',[Kepribadian::class,'cek'])->name('cek');
+	Route::post('get_soal',[Kepribadian::class,'get_soal'])->name('get_soal');
+	Route::post('update_waktu',[Kepribadian::class,'update_waktu'])->name('update_waktu');
+
+	// update time
+	Route::post('update_time',[Kepribadian::class,'post_update_time'])->name('post_update_time');
+	Route::patch('update_time',[Kepribadian::class,'patch_update_time'])->name('patch_update_time');
+	Route::post('cek_posisi_soal',[Kepribadian::class,'cek_posisi_soal'])->name('cek_posisi_soal');
+	Route::get('cek_warna',[Kepribadian::class,'cek_warna'])->name('cek_warna');
+	Route::post('upload_jawaban',[Kepribadian::class,'upload_jawaban'])->name('upload_jawaban');
+	Route::post('upload_jawaban_selesai',[Kepribadian::class,'upload_jawaban_selesai'])->name('upload_jawaban_selesai');
 
 	Route::get('profil',[Login::class,'profil'])->name('profil');
 	Route::post('profil',[Login::class,'profil'])->name('pprofil');

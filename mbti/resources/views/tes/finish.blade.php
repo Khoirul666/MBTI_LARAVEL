@@ -27,6 +27,7 @@
 </div>
 @push('jss')
 <script>
+    $('#l_d5').hide();
     $('#hasil-ada').hide();
     $('#hasil-belum').hide();
 
@@ -39,11 +40,13 @@
                     if ($('#l_d5').hide()) {
                         $('#l_d5').show();
                     }
+                    $("#menampilkan_soal").hide();
                     $('#hasil-ada').show();
                     tampil_hasil()
                     // console.log('ya')
                 }
                 else{
+                    $("#menampilkan_soal").show();
                     $('#l_d5').hide();
                     // console.log('tidak')
                 }

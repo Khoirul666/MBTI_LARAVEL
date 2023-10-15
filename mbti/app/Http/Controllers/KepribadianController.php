@@ -7,8 +7,10 @@ use App\Models\Kepribadian;
 use App\Models\Hasil;
 use App\Models\Jawaban;
 use App\Models\Training;
+use App\Models\Temp_Hasil;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Collection;
+use DB;
 
 class KepribadianController extends Controller
 {
@@ -32,6 +34,25 @@ class KepribadianController extends Controller
         // dd($data);
         return view('v_user.teskepribadian',compact('data'));
     }
+    public function teskepribadian_update()
+    {
+        if (Auth()->User()->role!='User') {
+            return redirect('index');
+        }
+        $isi = Hasil::where('id_users','=',Auth()->User()->id_user)->first();
+        if ($isi) {
+            $isi = true;
+        }
+        else{
+            $isi = false;
+        }
+        $data = [
+            'hasil' => Hasil::where('id_users','=',Auth()->User()->id_user)->first(),
+            'isi' => $isi,
+        ];
+        // dd($data['hasil']==null);
+        return view('v_user.teskepribadian_update',compact('data'));
+    }
     public function pkepribadian(Request $request)
     {   
         // dd(Auth()->User()->id_user);
@@ -45,6 +66,10 @@ class KepribadianController extends Controller
         else{
             return response()->json('gagal',200);
         }    
+    }
+    public function update_time(Request $request)
+    {
+        return response()->json('sukses',200);
     }
     public function tipekepribadian()
     {
@@ -196,15 +221,113 @@ class KepribadianController extends Controller
         return response()->json('kosong',200);
     }
 
-    public function FunctionName($value='')
+    public function post_update_time(Request $request)
     {
-        // code...
+        $data = Temp_Hasil::where('id_user','=',Auth()->User()->id_user)->first();
+        if ($data!=null) {
+            return response()->json($data,200);
+        }
+        else{
+            // insert ke dalam temp data
+            $time = 100;
+            $isi_data = [
+                'id_user'=>Auth()->User()->id_user,
+                'time_p1'=>$time,
+                'jawaban_p1'=>'0',
+                'time_p2'=>$time,
+                'time_p3'=>$time,
+                'time_p4'=>$time,
+                'time_p5'=>$time,
+                'time_p6'=>$time,
+                'time_p7'=>$time,
+                'time_p8'=>$time,
+                'time_p9'=>$time,
+                'time_p10'=>$time,
+                'time_p11'=>$time,
+                'time_p12'=>$time,
+                'time_p13'=>$time,
+                'time_p14'=>$time,
+                'time_p15'=>$time,
+                'time_p16'=>$time,
+                'time_p17'=>$time,
+                'time_p18'=>$time,
+                'time_p19'=>$time,
+                'time_p20'=>$time,
+            ];
+            Temp_Hasil::create($isi_data);
+            return response()->json($isi_data,200);
+        }
     }
+    public function patch_update_time(Request $request)
+    {
+        $update_waktu = Temp_Hasil::
+        where('id_user',Auth()->user()->id_user)->
+        update([
+            'time_p'.$request->soal => $request->waktu,
+        ]);
+        if ($update_waktu) {
+            return response('sukses',200);
+        }
+        else{
+            return response('gagal',200);
+        }
+    }
+    public function cek_posisi_soal(Request $request)
+    {
+        $data = [
+            'waktu'=>DB::table('temp_hasils')->where('id_user',Auth()->user()->id_user)->value('time_p'.$request->soal),
+            'jawaban'=>DB::table('temp_hasils')->where('id_user',Auth()->user()->id_user)->value('jawaban_p'.$request->soal)
+        ];
+        return response($data,200);
+    }
+    public function cek_warna()
+    {
+        $data = [
+            "isi"=>Temp_Hasil::where("id_user",Auth()->user()->id_user)->first(),
+        ];
+        return response($data,200);
+    }
+    public function upload_jawaban(Request $request){
+        $nama_kolom = 'jawaban_p'.$request->soal;
+        $update_jawaban = DB::table('temp_hasils')->
+        where('id_user',Auth()->user()->id_user)->
+        update([
+            $nama_kolom=>$request->jawaban,
+        ]);
+        // $update_jawaban=Temp_Hasil::where('id_user',Auth()->user()->id_user)->first();
 
+        $data = [
+            'soal'=>$request->soal,
+            'jawaban'=>$request->jawaban,
+            'status'=>$update_jawaban,
+        ];
+        return response($data,200);
+    }
+    public function upload_jawaban_selesai(Request $request)
+    {
+        $ambil_data = Temp_Hasil::where('id_user',Auth()->user()->id_user)->first();
+        $a = $ambil_data['jawaban_p1']+$ambil_data['jawaban_p2']+$ambil_data['jawaban_p3']+$ambil_data['jawaban_p4']+$ambil_data['jawaban_p5'];
+        $b = $ambil_data['jawaban_p6']+$ambil_data['jawaban_p7']+$ambil_data['jawaban_p8']+$ambil_data['jawaban_p9']+$ambil_data['jawaban_p10'];
+        $c = $ambil_data['jawaban_p11']+$ambil_data['jawaban_p12']+$ambil_data['jawaban_p13']+$ambil_data['jawaban_p14']+$ambil_data['jawaban_p15'];
+        $d = $ambil_data['jawaban_p16']+$ambil_data['jawaban_p17']+$ambil_data['jawaban_p18']+$ambil_data['jawaban_p19']+$ambil_data['jawaban_p20'];
+        $hapus_data = Temp_Hasil::where('id_user',Auth()->user()->id_user)->delete();
+        $insert_data = Hasil::create([
+            'id_users'=>Auth()->User()->id_user,
+            'jawaban'=>$a.",".$b.",".$c.",".$d,
+        ]);
+        if ($hapus_data==true&&$insert_data==true) {
+            return response("sukses",200);
+        }
+        else{
+            return response("gagal",200);
+        }
+    }
     public function cek()
     {
-        $data = Hasil::where('id_users','=',Auth()->User()->id_user)->first();
-        if ($data!=null) {
+        $data=[
+            'isi' => Hasil::where('id_users','=',Auth()->User()->id_user)->first(),
+        ]; 
+        if ($data['isi']!=null) {
             return response()->json('true',200);
         }
         else{
